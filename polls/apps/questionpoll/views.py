@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import json
+
 from django.views.generic import (
     ListView,
     UpdateView,
@@ -7,6 +9,8 @@ from django.views.generic import (
     FormView,
 )
 from django.urls import reverse
+
+from channels import Group
 
 from .models import Question
 from .forms import VoteForm
@@ -42,6 +46,14 @@ class VoteView(FormView):
         answer_id = form.cleaned_data.get('choice')
         answer = self.object.answers.get(pk=answer_id)
         answer.add_vote()
+
+        # Broadcast update to the appropriate group
+        channel_group = Group(self.object.get_channel_group_result())
+        channel_group.send({
+            "text": json.dumps(self.object.to_dict())
+        })
+
+        print self.object.to_dict()
 
         return super(VoteView,self).form_valid(form)
 

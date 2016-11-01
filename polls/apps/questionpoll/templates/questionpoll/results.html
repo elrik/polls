@@ -11,10 +11,10 @@
   {% for answer in object.answers.all %}
     <div class="row">
       <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
-        <p>{{ answer }}</p>
+        <p>{{ answer.answer_text }}</p>
       </div>
       <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-        <p>{{ answer.votes }}</p>
+        <p id="answer-id-{{ answer.pk }}" class="votes">{{ answer.votes }}</p>
       </div>
     </div>
   {% endfor %}
