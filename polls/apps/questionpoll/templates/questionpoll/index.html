@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <h1>Welcome to polls</h1>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="row">
+    {% for poll in object_list %}
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <p>{{ poll }}</p>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+        <a href='{% url "questionpoll:vote" id=poll.id %}'>Vote!</a>
+      </div>
+      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        <a href='{% url "questionpoll:results" pk=poll.id %}'>Se results!</a>
+      </div>
+    {% empty %}
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <p>No polls yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+
+
+{% endblock content %}
+

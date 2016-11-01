@@ -1,0 +1,15 @@
+# Standard files to ignore
+*sqlite3
+*.pyc
+*.swp
+*.mo
+*.db
+*.bak
+*.swp
+*.map
+fabric_settings*
+
+# Dirs to ignore
+config/
+.sass-cache/
+env/
