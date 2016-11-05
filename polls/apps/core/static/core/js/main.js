@@ -28,25 +28,31 @@ function generateGraph() {
 }
 
 function bindSocket() {
-  socket = new WebSocket("ws://" + window.location.host + window.location.pathname);
+  socket = new ReconnectingWebSocket("ws://" + window.location.host + window.location.pathname);
   socket.onmessage = function(e) {
-    var data = $.parseJSON(e.data);
-    var graph = $('div.graph.generate-graph').data('graph');
-
-    console.log(data);
-
-    graph.load({
-      'columns': data.answer_graph_data,
-    });
-
-    for (var idx in data.answers) {
-      var answer = data.answers[idx]
-      $("p.votes#answer-id-" + answer.id).text(answer.votes);
-    }
-
+    updateResults(e);
   }
 
-  socket.onopen = function() {}
+  socket.onopen = function(e) {
+    socket.send("update");
+  }
   // Call onopen directly if socket is already open
   if (socket.readyState == WebSocket.OPEN) socket.onopen();
+}
+
+function updateResults(e) {
+  console.log(e)
+  var data = $.parseJSON(e.data);
+  var graph = $('div.graph.generate-graph').data('graph');
+
+  console.log(data);
+
+  graph.load({
+    'columns': data.answer_graph_data,
+  });
+
+  for (var idx in data.answers) {
+    var answer = data.answers[idx]
+    $("p.votes#answer-id-" + answer.id).text(answer.votes);
+  }
 }
