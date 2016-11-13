@@ -47,12 +47,6 @@ class VoteView(FormView):
         answer = self.object.answers.get(pk=answer_id)
         answer.add_vote()
 
-        # Broadcast update to the appropriate group
-        channel_group = Group(self.object.get_channel_group_result())
-        channel_group.send({
-            "text": json.dumps(self.object.to_dict())
-        })
-
         print self.object.to_dict()
 
         return super(VoteView,self).form_valid(form)

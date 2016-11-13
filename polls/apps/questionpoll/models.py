@@ -1,5 +1,9 @@
 from __future__ import unicode_literals
 
+import json
+
+from channels import Group
+
 from django.db import models
 
 
@@ -11,6 +15,11 @@ class Question(models.Model):
 
     def get_channel_group_result(self):
         return "poll-result-%s" % (self.pk)
+
+    def get_channel_groups(self):
+        return [
+            "poll-result-%s" % (self.pk),
+        ]
 
     def to_dict(self):
         answers = [
@@ -41,6 +50,20 @@ class Answer(models.Model):
     def add_vote(self):
         self.votes = models.F('votes') + 1
         self.save()
+
+        # Broadcast update to the appropriate group
+        channel_group = Group(self.question.get_channel_group_result())
+
+        data = self.question.to_dict()
+
+        data.update({
+            'action': 'update-results',
+        })
+
+        channel_group.send({
+            "text": json.dumps(data)
+        })
+
 
     def to_dict(self):
         return {

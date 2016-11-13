@@ -12,6 +12,7 @@ class VoteForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         question = kwargs.pop('question')
+
         super(VoteForm, self).__init__(*args, **kwargs)
         self.fields['choice'].choices =  map(
             lambda x:
