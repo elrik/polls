@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import json
 
 from django.views.generic import (
     ListView,
@@ -10,10 +9,8 @@ from django.views.generic import (
 )
 from django.urls import reverse
 
-from channels import Group
-
 from .models import Question
-from .forms import VoteForm
+from .forms import VoteForm, AnswerForm
 
 
 class IndexView(ListView):
@@ -49,12 +46,34 @@ class VoteView(FormView):
 
         print self.object.to_dict()
 
-        return super(VoteView,self).form_valid(form)
+        return super(VoteView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('questionpoll:results', args=[self.object.id])
+
 
 class ResultsView(DetailView):
     model = Question
     template_name = 'questionpoll/results.html'
 
+
+class PollEdit(UpdateView):
+    model = Question
+    template_name = 'questionpoll/edit.html'
+    fields = ['question']
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(PollEdit, self).get_context_data(*args, **kwargs)
+
+        answer_forms = []
+
+        for answer in self.object.answers.all():
+            answer_forms.append(AnswerForm(instance=answer))
+
+        context.update({
+            'answer_forms': answer_forms,
+        })
+
+        # raise "Foo"
+
+        return context

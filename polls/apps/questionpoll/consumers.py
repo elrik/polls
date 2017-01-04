@@ -1,21 +1,30 @@
 from __future__ import unicode_literals
 
-from pprint import pprint as pp
 import json
 
-from django.http import HttpResponse
 from django.urls import reverse
 
-from channels import Group
-from channels.handler import AsgiHandler
-from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http
-from channels.routing import route
 from channels.generic.websockets import WebsocketConsumer
 
-from .models import Question, Answer
+from .models import Question  # , Answer
 from .forms import VoteForm
 
-class PollResultsConsumer(WebsocketConsumer):
+
+class MessageParser(object):
+    def parse_message(self, message):
+        try:
+            return json.loads(message)
+
+        except Exception as e:
+            print e
+            return None
+
+
+class PollResultsConsumer(MessageParser, WebsocketConsumer):
+    """
+    Polls consumer
+    """
+
     http_user = True
 
     strict_ordering = False
@@ -39,7 +48,7 @@ class PollResultsConsumer(WebsocketConsumer):
         pass
 
 
-class PollVoteConsumer(WebsocketConsumer):
+class PollEditConsumer(MessageParser, WebsocketConsumer):
     http_user = True
 
     strict_ordering = False
@@ -50,7 +59,61 @@ class PollVoteConsumer(WebsocketConsumer):
         Called to return the list of groups to automatically add/remove
         this connection to/from.
         """
-        res =  [
+        return ["poll-edit-%s" % (poll_id)]
+
+    def connect(self, message, **kwargs):
+        poll = Question.objects.get(pk=kwargs.get('poll_id', ""))
+        self.send(json.dumps(poll.to_dict()))
+
+    def receive(self, text=None, bytes=None, **kwargs):
+        print self.message.user.is_superuser
+        print text
+
+        data = self.parse_message(text)
+
+        if self.message.user.has_perm("questionpoll.change_question") and data:
+            poll = Question.objects.get(pk=kwargs.get('poll_id', ""))
+
+            if data.get('action', None) == "update-poll":
+                poll.question = data['data'].get('question', poll.question)
+
+                poll.save()
+
+            elif data.get('action', None) == "update-answer":
+                answer = poll.answers.filter(
+                    pk=data['data'].get('id', None)
+                )
+
+                answer.update(answer_text=data['data'].get('answer_text'))
+
+            self.send(json.dumps({
+                'action': 'update-poll',
+                'status': "success",
+                'poll': poll.to_dict(),
+            }))
+
+        else:
+            self.send(json.dumps({
+                'status': "error",
+                'type': 'permission',
+            }))
+
+    def disconnect(self, message, **kwargs):
+        pass
+
+
+class PollVoteConsumer(MessageParser, WebsocketConsumer):
+    http_user = True
+
+    strict_ordering = False
+    slight_ordering = False
+
+    def connection_groups(self, poll_id, **kwargs):
+        """
+        Called to return the list of groups to automatically add/remove
+        this connection to/from.
+        """
+        res = [
             "poll-vote-%s" % (poll_id),
             "poll-result-%s" % (poll_id),
         ]
@@ -92,14 +155,5 @@ class PollVoteConsumer(WebsocketConsumer):
                     'errors': form.errors,
                 }))
 
-
     def disconnect(self, message, **kwargs):
         pass
-
-    def parse_message(self, message):
-        try:
-            return json.loads(message)
-
-        except Exception as e:
-            return None
-

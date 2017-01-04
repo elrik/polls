@@ -7,7 +7,7 @@
   </div>
   <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <form method="POST" action='{% url "questionpoll:vote" id=view.object.id %}' class="vote-form">
+      <form method="POST" action='{% url "questionpoll:vote" id=view.object.id %}' class="vote-form socket-form" data-action="vote">
         {% csrf_token %}
         {{ form }}
 

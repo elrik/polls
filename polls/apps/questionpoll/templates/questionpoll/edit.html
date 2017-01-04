@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <h1 id="poll-question">{{ view.object.question }}</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <form method="POST" action='{% url "questionpoll:edit" pk=view.object.id %}' class="socket-form" data-action="update-poll">
+        {% csrf_token %}
+        {{ form }}
+        <input type='submit' value="Save">
+      </form>
+    </div>
+  </div>
+
+  <!-- Add answers here -->
+  {% for form in answer_forms %}
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <form method="POST" action='{% url "questionpoll:edit" pk=view.object.id %}' class="socket-form" data-action="update-answer">
+          {% csrf_token %}
+          <input type="hidden" name="id" value='{{ form.instance.pk }}'>
+          {{ form }}
+          <input type='submit' value="Save">
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock content %}

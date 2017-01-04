@@ -34,6 +34,7 @@ class Question(models.Model):
 
         return {
             'id': self.pk,
+            'question': self.question,
             'answers': answers,
             'answer_graph_data': answer_graph_data,
         }
@@ -63,7 +64,6 @@ class Answer(models.Model):
         channel_group.send({
             "text": json.dumps(data)
         })
-
 
     def to_dict(self):
         return {

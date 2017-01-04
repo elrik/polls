@@ -3,8 +3,8 @@ $(document).ready(function() {
     generateGraph();
   }
 
-  if ($("form.vote-form").length > 0) {
-    bindVoteForm();
+  if ($("form.socket-form").length > 0) {
+    bindSocketForm();
   }
 
   bindSocket();
@@ -35,10 +35,16 @@ function bindSocket() {
   socket = new ReconnectingWebSocket("ws://" + window.location.host + window.location.pathname);
   socket.onmessage = function(e) {
     var data = $.parseJSON(e.data);
+
+    xxx = data
+    yyy = e
+
     if (data.action == "update-results") {
       updateResults(data);
     } else if (data.action == "vote") {
       voteEvent(data);
+    } else if (data.action == "update-poll") {
+      pollUpdateEvent(data);
     }
   }
 
@@ -71,24 +77,34 @@ function voteEvent(data) {
   }
 }
 
-function bindVoteForm() {
-  $("form.vote-form").submit(function(event) {
+function bindSocketForm() {
+  $("form.socket-form").submit(function(event) {
     event.preventDefault();
 
     var $this = $(this);
+    var formData = $this.serializeArray();
+    var action = $this.data('action');
 
-    formData = $this.serializeArray();
+    action = action ? action : "vote";
+
 
     data = {}
     formData.map(function(x){data[x.name] = x.value;})
 
     socket.send(JSON.stringify(
       {
-        action: "vote",
+        action: action,
         data: data,
       }
     ));
 
     return false;
   });
+}
+
+
+function pollUpdateEvent(data) {
+  if (data.status == "success") {
+    $("#poll-question").text(data.poll.question);
+  }
 }
