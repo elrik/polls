@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     # Standard apps
     'debug_toolbar',
     'django_extensions',
-    'compressor',
+    'pipeline',
     'channels',
 
     # Project apps
@@ -65,6 +65,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
+    'pipeline.middleware.MinifyHTMLMiddleware',
 ]
 
 ROOT_URLCONF = 'polls.urls'
@@ -140,7 +141,8 @@ USE_TZ = True
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    'compressor.finders.CompressorFinder',
+    'pipeline.finders.CachedFileFinder',
+    'pipeline.finders.PipelineFinder',
 )
 
 STATIC_URL = '/static/'
@@ -149,6 +151,7 @@ STATIC_ROOT = os.path.join(
     "site_media",
     "static",
 )
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(
@@ -165,6 +168,51 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = DEBUG
 
 # Should we compile less files clientside
 LESS_COMPILE_CLIENTSIDE = DEBUG
+
+PIPELINE = {
+    'PIPELINE_ENABLED': DEBUG is False,
+    'PIPELINE_COLLECTOR_ENABLED': True,
+    'JAVASCRIPT': {
+        'vendor': {
+            'source_filenames': (
+                'core/vendor/jquery-3.1.0.min.js',
+                'core/vendor/bootstrap-3.3.7/js/bootstrap.min.js',
+                'core/vendor/d3/d3.min.js',
+                'core/vendor/c3/c3.min.js',
+            ),
+            'output_filename': 'js/vendor.js',
+        },
+        'app': {
+            'source_filenames': (
+                'channels/js/websocketbridge.js',
+                'core/js/main.js',
+            ),
+            'output_filename': 'js/app.js',
+        },
+    },
+    'STYLESHEETS': {
+        'vendor': {
+            'source_filenames': (
+                'core/vendor/bootstrap-3.3.7/css/bootstrap.min.css',
+                'core/vendor/font-awesome-4.6.3/css/font-awesome.min.css',
+                'core/vendor/c3/c3.min.css',
+            ),
+            'output_filename': "css/vendor.css",
+        },
+        'app': {
+            'source_filenames': (
+                'core/less/main.less',
+            ),
+            'output_filename': "css/app.css",
+        },
+    },
+    'COMPILERS': (
+        'pipeline.compilers.less.LessCompiler',
+    ),
+    'CSS_COMPRESSOR': 'pipeline.compressors.yuglify.YuglifyCompressor',
+    'JS_COMPRESSOR': 'pipeline.compressors.yuglify.YuglifyCompressor',
+}
+
 
 # In settings.py
 CHANNEL_LAYERS = {

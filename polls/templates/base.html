@@ -1,4 +1,4 @@
-{% load i18n compress static %}
+{% load i18n static pipeline %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,22 +8,8 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Polls</title>
 
-
-    {% if less_compile_clientside %}
-      <link href="{% static 'core/vendor/bootstrap-3.3.7/css/bootstrap.min.css' %}" rel="stylesheet">
-      <link href="{% static 'core/vendor/font-awesome-4.6.3/css/font-awesome.min.css' %}" rel="stylesheet">
-      <link href="{% static 'core/vendor/c3/c3.min.css' %}" rel="stylesheet" type="text/css">
-
-      <link rel="stylesheet/less" href="{% static 'core/less/main.less' %}">
-      <script src="{% static 'core/vendor/less.min.js' %}"></script>
-    {% else %}
-      {% compress css %}
-        <link href="{% static 'core/vendor/bootstrap-3.3.7/css/bootstrap.min.css' %}" rel="stylesheet">
-        <link href="{% static 'core/vendor/font-awesome-4.6.3/css/font-awesome.min.css' %}" rel="stylesheet">
-        <link href="{% static 'core/vendor/c3/c3.min.css' %}" rel="stylesheet" type="text/css">
-        <link href="{% static 'core/css/main.css' %}" rel="stylesheet">
-      {% endcompress %}
-    {% endif %}
+    {% stylesheet 'vendor' %}
+    {% stylesheet 'app' %}
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -59,16 +45,8 @@
 
     {% endblock body_content %}
     {% block js_block %}
-      {% compress js %}
-        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-        <script src="{% static 'core/vendor/jquery-3.1.0.min.js' %}"></script>
-        <!-- Include all compiled plugins (below), or include individual files as needed -->
-        <script src='{% static "channels/js/websocketbridge.js" %}'></script>
-        <script src="{% static 'core/vendor/bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
-        <script src="{% static 'core/vendor/d3/d3.min.js' %}"></script>
-        <script src="{% static 'core/vendor/c3/c3.min.js' %}"></script>
-        <script src="{% static 'core/js/main.js' %}"></script>
-      {% endcompress %}
+      {% javascript 'vendor' %}
+      {% javascript 'app' %}
     {% endblock %}
   </body>
 </html>
