@@ -1,8 +1,9 @@
 $(document).ready(function() {
+  window.__webSocketBridge__ = new channels.WebSocketBridge();
+
   if ($("div.graph.generate-graph").length > 0) {
     generateGraph();
   }
-
   if ($("form.socket-form").length > 0) {
     bindSocketForm();
   }
@@ -32,13 +33,8 @@ function generateGraph() {
 }
 
 function bindSocket() {
-  socket = new ReconnectingWebSocket("ws://" + window.location.host + window.location.pathname);
-  socket.onmessage = function(e) {
-    var data = $.parseJSON(e.data);
-
-    xxx = data
-    yyy = e
-
+  window.__webSocketBridge__.connect(window.location.pathname);
+  window.__webSocketBridge__.listen(function(data, stream) {
     if (data.action == "update-results") {
       updateResults(data);
     } else if (data.action == "vote") {
@@ -46,13 +42,11 @@ function bindSocket() {
     } else if (data.action == "update-poll") {
       pollUpdateEvent(data);
     }
-  }
+  })
 
-  socket.onopen = function(e) {
-    socket.send("update");
-  }
-  // Call onopen directly if socket is already open
-  if (socket.readyState == WebSocket.OPEN) socket.onopen();
+  window.__webSocketBridge__.socket.addEventListener('open', function() {
+    window.__webSocketBridge__.send("update");
+  });
 }
 
 function updateResults(data) {
@@ -91,12 +85,10 @@ function bindSocketForm() {
     data = {}
     formData.map(function(x){data[x.name] = x.value;})
 
-    socket.send(JSON.stringify(
-      {
-        action: action,
-        data: data,
-      }
-    ));
+    window.__webSocketBridge__.send({
+      action: action,
+      data: data,
+    });
 
     return false;
   });

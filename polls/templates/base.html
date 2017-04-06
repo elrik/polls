@@ -63,10 +63,10 @@
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script src="{% static 'core/vendor/jquery-3.1.0.min.js' %}"></script>
         <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src='{% static "channels/js/websocketbridge.js" %}'></script>
         <script src="{% static 'core/vendor/bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
         <script src="{% static 'core/vendor/d3/d3.min.js' %}"></script>
         <script src="{% static 'core/vendor/c3/c3.min.js' %}"></script>
-        <script src="{% static 'core/vendor/reconnecting-websocket/reconnecting-websocket.min.js' %}"></script>
         <script src="{% static 'core/js/main.js' %}"></script>
       {% endcompress %}
     {% endblock %}
