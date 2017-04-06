@@ -12,3 +12,6 @@ django-pipeline==1.6.12
 # Project related packages
 channels==1.1.2
 asgi-redis==1.2.1
+
+sphinx-rtd-theme==0.2.4
+Sphinx==1.5.5

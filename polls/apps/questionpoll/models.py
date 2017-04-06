@@ -41,6 +41,12 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
+    """
+    Answer model.
+
+    This is model for the answers.
+    """
+
     question = models.ForeignKey(Question, related_name='answers')
     answer_text = models.CharField(max_length=255)
     votes = models.IntegerField(default=0)
@@ -49,6 +55,12 @@ class Answer(models.Model):
         return "%s: %s" % (self.question, self.answer_text)
 
     def add_vote(self):
+        """
+        Add vote function.
+
+        This function adds vote using django db expressions
+        """
+
         self.votes = models.F('votes') + 1
         self.save()
 
@@ -66,6 +78,11 @@ class Answer(models.Model):
         })
 
     def to_dict(self):
+        """
+        Map out answer object to dict.
+
+        This is mainly used in the channels for generating table and graphs
+        """
         return {
             'id': self.pk,
             'answer_text': self.answer_text,

@@ -14,6 +14,11 @@ from .forms import VoteForm, AnswerForm
 
 
 class IndexView(ListView):
+    """
+    Main index view.
+
+    This view is used for showing polls overview
+    """
     model = Question
     template_name = 'questionpoll/index.html'
 
