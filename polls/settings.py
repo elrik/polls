@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'pipeline',
     'channels',
+    'docs',
+
 
     # Project apps
     'core',
@@ -222,6 +224,9 @@ CHANNEL_LAYERS = {
         "ROUTING": "polls.routing.channel_routing",
     },
 }
+
+DOCS_ROOT = os.path.join(BASE_DIR, 'docs/_build/html')
+DOCS_ACCESS = 'staff'
 
 # If we have external settings load data
 if os.path.exists(

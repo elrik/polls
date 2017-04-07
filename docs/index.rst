@@ -22,8 +22,9 @@ Indices and tables
 
 If you want to die, then type this into the console
 
-something about questionpoll::
+something about ``questionpoll``
 
-.. code-block:: console
+:py:class:`questionpoll.Question`
 
-  sudo rm -rf /*
+
+:py:class:`questionpoll.Answer`
