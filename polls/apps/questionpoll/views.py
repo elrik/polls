@@ -6,8 +6,10 @@ from django.views.generic import (
     UpdateView,
     DetailView,
     FormView,
+    View,
 )
 from django.urls import reverse
+from django.http import JsonResponse
 
 from .models import Question
 from .forms import VoteForm, AnswerForm
@@ -82,3 +84,33 @@ class PollEdit(UpdateView):
         # raise "Foo"
 
         return context
+
+
+class FetchPollsView(View):
+    def get(self, request, *args, **kwargs):
+        polls = Question.objects.all()
+        user = self.request.user
+
+        print request
+        print user
+
+        can_edit = user.has_perm('questionpoll.change_question')
+
+        data = []
+
+        for poll in polls:
+            json = poll.to_dict()
+            edit_url = reverse("questionpoll:edit", kwargs={'pk': poll.pk})
+            vote_url = reverse("questionpoll:vote", kwargs={'id': poll.pk})
+            result_url = reverse(
+                "questionpoll:results", kwargs={'pk': poll.pk})
+
+            json.update({
+                'vote_url': vote_url,
+                'result_url': result_url,
+                'edit_url': edit_url if can_edit else "",
+
+            })
+            data.append(json)
+
+        return JsonResponse(data, safe=False)

@@ -1,41 +1,42 @@
 {% extends 'base.html' %}
+
+{% load pipeline %}
+
 {% block content %}
-  <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <h1>Welcome to polls</h1>
-    </div>
-  </div>
-
-  <hr />
-
-  {% for poll in object_list %}
-    <div class="row">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-        <p>{{ poll }}</p>
-      </div>
-      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-        <a href='{% url "questionpoll:vote" id=poll.id %}'>Vote!</a>
-      </div>
-      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-        <a href='{% url "questionpoll:results" pk=poll.id %}'>Se results!</a>
-      </div>
-
-      {% if perms.questionpoll.change_question %}
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-          <a href='{% url "questionpoll:edit" pk=poll.id %}'>Edit</a>
-        </div>
-      {% endif %}
-
-    </div>
-  {% empty %}
+  <div class="container hide" id="pollsApp">
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <p>No polls yet.</p>
+        {% verbatim %}<h1>{{ greeting }}</h1>{% endverbatim %}
       </div>
     </div>
-  {% endfor %}
 
+    {% verbatim %}
+      <div v-if="polls.length">
+        <div class="row" v-for="(poll, idx) in polls" :key="poll.id">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <p>{{ poll.question }}</p>
+          </div>
+          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+            <a v-bind:href='poll.vote_url'>Vote!</a>
+          </div>
+          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+            <a v-bind:href='poll.result_url'>Se results!</a>
+          </div>
 
+          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" v-if="poll.edit_url">
+            <a v-bind:href='poll.edit_url'>Edit</a>
+          </div>
+        </div>
+      </div>
+      <p v-else>
+        No polls defined!
+      </p>
+    {% endverbatim %}
+  </div>
 
 {% endblock content %}
 
+{% block js_block %}
+  {{ block.super }}
+  {% javascript 'polls_index' %}
+{% endblock js_block %}

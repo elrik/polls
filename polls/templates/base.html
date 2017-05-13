@@ -44,6 +44,15 @@
       </div>
 
     {% endblock body_content %}
+
+    <script type="text/javascript">
+    Polls = {
+      urls: {
+        fetchPolls: '{% url "questionpoll:fetch_all" %}',
+      }
+    }
+    </script>
+
     {% block js_block %}
       {% javascript 'vendor' %}
       {% javascript 'app' %}

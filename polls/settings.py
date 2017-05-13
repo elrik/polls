@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'pipeline',
     'channels',
     'docs',
+    'rest_framework',
 
 
     # Project apps
@@ -177,10 +178,12 @@ PIPELINE = {
     'JAVASCRIPT': {
         'vendor': {
             'source_filenames': (
+                'https://cdn.polyfill.io/v2/polyfill.min.js',
                 'core/vendor/jquery-3.1.0.min.js',
                 'core/vendor/bootstrap-3.3.7/js/bootstrap.min.js',
                 'core/vendor/d3/d3.min.js',
                 'core/vendor/c3/c3.min.js',
+                'core/vendor/vue.min.js',
             ),
             'output_filename': 'js/vendor.js',
         },
@@ -190,6 +193,14 @@ PIPELINE = {
                 'core/js/main.js',
             ),
             'output_filename': 'js/app.js',
+        },
+        'polls_index': {
+            'source_filenames': (
+                'questionpoll/js/polls_index_vue.js',
+            ),
+            'output_filename': (
+                'js/polls_index_vue.js',
+            ),
         },
     },
     'STYLESHEETS': {
@@ -227,6 +238,14 @@ CHANNEL_LAYERS = {
 
 DOCS_ROOT = os.path.join(BASE_DIR, 'docs/_build/html')
 DOCS_ACCESS = 'staff'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAdminUser',
+    ],
+    'PAGE_SIZE': 10
+}
 
 # If we have external settings load data
 if os.path.exists(
