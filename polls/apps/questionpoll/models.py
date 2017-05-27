@@ -39,6 +39,24 @@ class Question(models.Model):
             'answer_graph_data': answer_graph_data,
         }
 
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    @staticmethod
+    def has_create_permission(request):
+        return request.user.has_perm('questionpoll.add_question')
+
+    @staticmethod
+    def has_write_permission(request):
+        return request.user.has_perm('questionpoll.add_question')
+
+    def has_object_read_permission(self, request):
+        return True
+
+    def has_object_write_permission(self, request):
+        return request.user.has_perm('questionpoll.change_question')
+
 
 class Answer(models.Model):
     """
@@ -61,16 +79,23 @@ class Answer(models.Model):
         This function adds vote using django db expressions
         """
 
-        self.votes = models.F('votes') + 1
+        self.votes += 1
         self.save()
 
+        self.send_message()
+
+    def send_message(self):
+        from .serializers import QuestionSerializer
         # Broadcast update to the appropriate group
         channel_group = Group(self.question.get_channel_group_result())
 
         data = self.question.to_dict()
 
+        serializer = QuestionSerializer(self.question)
+
         data.update({
             'action': 'update-results',
+            'question': serializer.data,
         })
 
         channel_group.send({
@@ -88,3 +113,37 @@ class Answer(models.Model):
             'answer_text': self.answer_text,
             'votes': self.votes,
         }
+
+    def save(self, *args, **kwargs):
+        super(Answer, self).save(*args, **kwargs)
+
+        self.send_message()
+
+    def delete(self, *args, **kwargs):
+        super(Answer, self).delete(*args, **kwargs)
+        self.send_message()
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    @staticmethod
+    def has_create_permission(request):
+        return request.user.has_perm('questionpoll.add_answer')
+
+    @staticmethod
+    def has_write_permission(request):
+        return request.user.has_perm('questionpoll.add_answer')
+
+    def has_object_read_permission(self, request):
+        return True
+
+    def has_object_write_permission(self, request):
+        return request.user.has_perm('questionpoll.change_answer')
+
+    @staticmethod
+    def has_vote_permission(request):
+        return True
+
+    def has_object_vote_permission(self, request):
+        return True

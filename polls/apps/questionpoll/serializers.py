@@ -15,4 +15,4 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ('id', 'question', 'answer_text', 'votes')
-        read_only_fields = ('votes',)
+        read_only_fields = ('id', 'votes')

@@ -8,6 +8,7 @@ from channels.generic.websockets import WebsocketConsumer
 
 from .models import Question  # , Answer
 from .forms import VoteForm
+from .serializers import QuestionSerializer
 
 
 class MessageParser(object):
@@ -39,7 +40,8 @@ class PollResultsConsumer(MessageParser, WebsocketConsumer):
 
     def connect(self, message, **kwargs):
         poll = Question.objects.get(pk=kwargs.get('poll_id', ""))
-        self.send(json.dumps(poll.to_dict()))
+        serializer = QuestionSerializer(poll)
+        self.send(json.dumps(serializer.data))
 
     def receive(self, text=None, bytes=None, **kwargs):
         print self.message.user.is_superuser
@@ -86,10 +88,13 @@ class PollEditConsumer(MessageParser, WebsocketConsumer):
 
                 answer.update(answer_text=data['data'].get('answer_text'))
 
+            serializer = QuestionSerializer(poll)
+
             self.send(json.dumps({
                 'action': 'update-poll',
                 'status': "success",
                 'poll': poll.to_dict(),
+                'data': serializer.data
             }))
 
         else:

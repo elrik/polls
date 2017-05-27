@@ -16,3 +16,7 @@ asgi-redis==1.2.1
 sphinx-rtd-theme==0.2.4
 Sphinx==1.5.5
 django-docs==0.2.1
+
+# Rest framework packages
+djangorestframework==3.6.2
+dry-rest-permissions==0.1.9

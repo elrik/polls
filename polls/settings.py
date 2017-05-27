@@ -43,13 +43,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Standard apps
-    'debug_toolbar',
+    # 'debug_toolbar',
     'django_extensions',
     'pipeline',
     'channels',
     'docs',
     'rest_framework',
-
+    'dry_rest_permissions',
 
     # Project apps
     'core',
@@ -184,12 +184,12 @@ PIPELINE = {
                 'core/vendor/d3/d3.min.js',
                 'core/vendor/c3/c3.min.js',
                 'core/vendor/vue.min.js',
+                'channels/js/websocketbridge.js',
             ),
             'output_filename': 'js/vendor.js',
         },
         'app': {
             'source_filenames': (
-                'channels/js/websocketbridge.js',
                 'core/js/main.js',
             ),
             'output_filename': 'js/app.js',
