@@ -202,6 +202,22 @@ PIPELINE = {
                 'js/polls_index_vue.js',
             ),
         },
+        'polls_edit': {
+            'source_filenames': (
+                'questionpoll/js/polls_edit_vue.js',
+            ),
+            'output_filename': (
+                'js/polls_edit_vue.js',
+            ),
+        },
+        'polls_results': {
+            'source_filenames': (
+                'questionpoll/js/polls_results_vue.js',
+            ),
+            'output_filename': (
+                'js/polls_results_vue.js',
+            ),
+        },
     },
     'STYLESHEETS': {
         'vendor': {

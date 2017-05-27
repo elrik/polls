@@ -1,44 +1,53 @@
 {% extends 'base.html' %}
+{% load pipeline %}
+
 {% block content %}
-  <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <h1>{{ object }}</h1>
-    </div>
-  </div>
 
-  <hr />
-
-  {% for answer in object.answers.all %}
+  <div class="container" id="appResult" data-object-id="{{ view.object.id }}">
     <div class="row">
-      <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
-        <p>{{ answer.answer_text }}</p>
-      </div>
-      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-        <p id="answer-id-{{ answer.pk }}" class="votes">{{ answer.votes }}</p>
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h1>
+          [[ object.question ]]
+        </h1>
       </div>
     </div>
-  {% endfor %}
 
-  <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <div class='text-center graph generate-graph'>
+    <hr />
+
+    <div v-if="answers.length">
+      <div class="row" v-for="(answer, idx) in answers" :key="answer.id">
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+          <p>[[ answer.answer_text ]]</p>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+          <p id="answer-id-[[ answer.id ]]" class="votes">[[ answer.votes ]]</p>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="row links">
-    <a href='{% url "questionpoll:index" %}'>Polls overview</a>
-    <a href='{% url "questionpoll:vote" id=object.id %}'>Vote again</a>
+
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class='text-center graph generate-graph'>
+        </div>
+      </div>
+    </div>
+    <div class="row links">
+      <a href='{% url "questionpoll:index" %}'>Polls overview</a>
+      <a href='{% url "questionpoll:vote" id=object.id %}'>Vote again</a>
+    </div>
   </div>
 {% endblock content %}
 
 
 {% block js_block %}
   {{ block.super }}
+  {% javascript 'app' %}
+  {% javascript 'polls_results' %}
   <script type='text/javascript'>
     window.__initialGraphData__ = {
       'data': [
         {% for answer in object.answers.all %}
-          ['{{ answer.answer_text}}', {{ answer.votes }}],
+          ['{{ answer.answer_text|safe }}', {{ answer.votes }}],
         {% endfor %}
       ],
       'title': '{{ object.question }}',

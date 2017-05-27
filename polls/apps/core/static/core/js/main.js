@@ -36,12 +36,17 @@ function bindSocket() {
   window.__webSocketBridge__.connect(window.location.pathname);
   window.__webSocketBridge__.listen(function(data, stream) {
     if (data.action == "update-results") {
-      updateResults(data);
+      // updateResults(data);
     } else if (data.action == "vote") {
       voteEvent(data);
     } else if (data.action == "update-poll") {
       pollUpdateEvent(data);
     }
+
+    console.log("123123")
+    window.__app__.handleSocketMessage(data);
+    console.log("456456")
+
   })
 
   window.__webSocketBridge__.socket.addEventListener('open', function() {

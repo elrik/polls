@@ -2,6 +2,7 @@
 
 window.onload=function(){
   window.__app__ = new Vue({
+    delimiters: ["[[", "]]"],
     el: '#pollsApp',
 
     data: {

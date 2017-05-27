@@ -1,31 +1,50 @@
 {% extends 'base.html' %}
-{% block content %}
-  <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <h1 id="poll-question">{{ view.object.question }}</h1>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <form method="POST" action='{% url "questionpoll:edit" pk=view.object.id %}' class="socket-form" data-action="update-poll">
-        {% csrf_token %}
-        {{ form }}
-        <input type='submit' value="Save">
-      </form>
-    </div>
-  </div>
 
-  <!-- Add answers here -->
-  {% for form in answer_forms %}
+{% load pipeline %}
+
+{% block content %}
+
+  <div class="container hide" id="app" data-object-id="{{ view.object.id }}">
     <div class="row">
+      {% verbatim %}
+        <div class="row" :key="object.id">
+          <h1 id="poll-question">
+            {{ object.question }}
+          </h1>
+        </div>
+      {% endverbatim %}
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <form method="POST" action='{% url "questionpoll:edit" pk=view.object.id %}' class="socket-form" data-action="update-answer">
-          {% csrf_token %}
-          <input type="hidden" name="id" value='{{ form.instance.pk }}'>
-          {{ form }}
-          <input type='submit' value="Save">
-        </form>
       </div>
     </div>
-  {% endfor %}
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <input type="text" v-model.trim.lazy="newText" v-update="addAnswer(newText)" placeholder="Add another answer">
+      </div>
+    </div>
+
+    {% verbatim %}
+      <div v-if="answers.length">
+        <div class="row" v-for="(answer, idx) in answers" :key="answer.id">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <p v-show="answer != editedAnswer">{{ answer.answer_text }}</p>
+            <input class="new-todo" v-show="answer == editedAnswer" autofocus autocomplete="off" v-model="answer.answer_text" @keyup.enter="updateAnswer(answer)">
+          </div>
+          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+            <a @click='editAnswer(answer)'>Edit</a>
+          </div>
+          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+            <a @click='deleteAnswer(answer)'>Remove</a>
+          </div>
+        </div>
+      </div>
+      <p v-else>
+        No answers yet
+      </p>
+    {% endverbatim %}
+  </div>
 {% endblock content %}
+
+{% block js_block %}
+  {{ block.super }}
+  {% javascript 'polls_edit' %}
+{% endblock js_block %}

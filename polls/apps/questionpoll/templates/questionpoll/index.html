@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% load pipeline %}
 
@@ -6,37 +6,35 @@
   <div class="container hide" id="pollsApp">
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        {% verbatim %}<h1>{{ greeting }}</h1>{% endverbatim %}
+        <h1>[[ greeting ]]</h1>
       </div>
     </div>
 
-    {% verbatim %}
-      <div v-if="polls.length">
-        <div class="row" v-for="(poll, idx) in polls" :key="poll.id">
-          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-            <p>{{ poll.question }}</p>
-          </div>
-          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-            <a v-bind:href='poll.vote_url'>Vote!</a>
-          </div>
-          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-            <a v-bind:href='poll.result_url'>Se results!</a>
-          </div>
+    <div v-if="polls.length">
+      <div class="row" v-for="(poll, idx) in polls" :key="poll.id">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+          <p>[[ poll.question ]]</p>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+          <a v-bind:href="poll.vote_url">Vote!</a>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+          <a v-bind:href="poll.result_url">Se results!</a>
+        </div>
 
-          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" v-if="poll.edit_url">
-            <a v-bind:href='poll.edit_url'>Edit</a>
-          </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" v-if="poll.edit_url">
+          <a v-bind:href="poll.edit_url">Edit</a>
         </div>
       </div>
-      <p v-else>
-        No polls defined!
-      </p>
-    {% endverbatim %}
+    </div>
+    <p v-else>
+      No polls defined!
+    </p>
   </div>
 
 {% endblock content %}
 
 {% block js_block %}
   {{ block.super }}
-  {% javascript 'polls_index' %}
+  {% javascript "polls_index" %}
 {% endblock js_block %}
